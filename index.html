@@ -1,0 +1,81 @@
+<!DOCTYPE html><html>
+    <head>
+	<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <title>Basit Chat Odası</title>
+    <style type="text/css">
+body             { background:#57767F; font-family:arial;}
+input, textarea  { font-family: courier new; font-size: 12px; }
+
+#chatwindow      { border:1px solid #aaaaaa; padding:4px; background:#232D2F; color:white;}
+.chatnick        { border: none; border-bottom:1px solid #aaaaaa; padding:4px; background:#57767F;}
+#chatmsg         { border: none; border-bottom:1px solid #aaaaaa; padding:4px; background:#57767F; }
+
+::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+  color: white;
+  opacity: 1; /* Firefox */
+}
+
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+  color: white;
+}
+
+::-ms-input-placeholder { /* Microsoft Edge */
+  color: white;
+}
+</style>
+<script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+    </head>
+    <body>
+        <p>Aşağıdaki chat uygulaması tek bir txt dosyasına yazılan metinleri gönderen ve okuyan bir özelliğe sahiptir. Kullandığınız linki bilen herkes istediği ismi yazarak sohbete katılabilir.</p>
+            <textarea id="chatwindow" rows="19" cols="95" readonly></textarea><br>
+            <input type="text" name="username" id="username" style="width:50px" class="chatnick" placeholder="Ad">
+			&nbsp;<input id="chatmsg" type="text" size="80" maxlength="1000" placeholder="Mesaj yaz ve entera bas">
+            <input type="button" value="Gönder" id="gonder" style="cursor:pointer;border:1px solid gray;"><br><br>
+        
+    </body>
+</html>
+
+<script type="text/javascript">
+$( document ).ready(function() {
+	
+	
+	setInterval(function(){ al(); }, 3000);
+	function al(){		
+		$.ajax({
+			type: "POST",
+			url: "chatGonder.php",
+			data: "t=2",
+			success: function(data){
+				if($("#chatwindow").val()!=data){
+					$("#chatwindow").val(data);
+					var messageBody = document.querySelector('#chatwindow');
+					messageBody.scrollTop = messageBody.scrollHeight - messageBody.clientHeight;
+				}
+			}				
+		});
+	}
+	$("#gonder").click(function(e) {
+		var e = jQuery.Event("keypress");
+		e.which = 13;	
+		$("#chatmsg").trigger(e);
+	});
+	
+	$("#chatmsg").keypress(function(e) {
+		name = $("#username").val();
+		if(e.which == 13) {			
+			$.ajax({
+				type: "POST",
+				url: "chatGonder.php",
+				data: "t=1&m="+name+": "+$("#chatmsg").val(),
+				success: function(data){ 					
+					$("#chatmsg").val("");
+					console.log(data);
+				}				
+			});
+		}
+	});
+	
+});
+
+
+</script>
